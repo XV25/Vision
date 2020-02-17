@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-cap = cv.VideoCapture(0)
+cap = cv.VideoCapture('nathan.avi')
 while(1):
     # Take each frame
     _, frame = cap.read()
@@ -10,7 +10,9 @@ while(1):
     # Bleu
     lower_blue = np.array([91,90,110])
     upper_blue = np.array([110,255,255])
-
+    #Orange
+    lower_blue = np.array([0,90,110])
+    upper_blue = np.array([24,255,255])
     # Threshold the HSV image to get only blue colors
     mask = cv.inRange(hsv, lower_blue, upper_blue)
     # Bitwise-AND mask and original image
