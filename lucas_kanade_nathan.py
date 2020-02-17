@@ -18,7 +18,7 @@ lk_params = dict( winSize  = (15,15),
 color = np.random.randint(0,255,(100,3))
 
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture('nathan.avi')
 # Take first frame and find corners in it
 ret, old_frame = cap.read()
 old_gray = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
@@ -26,9 +26,8 @@ old_gray = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
 
 hsv = cv2.cvtColor(old_frame, cv2.COLOR_BGR2HSV)
     
-# Bleu
-lower_blue = np.array([91,90,110])
-upper_blue = np.array([110,255,255])
+lower_blue = np.array([0,90,110])
+upper_blue = np.array([24,255,255])
 
 # Threshold the HSV image to get only blue colors
 mask = cv2.inRange(hsv, lower_blue, upper_blue)
@@ -47,7 +46,10 @@ for i in range (len(contours)):
         cy = int(M['m01']/(M['m00']+1*10**-5))
         #cv2.circle(res,(cx,cy), 4, (0,255,100), -1) 
         break
-p0 = [cx,cy]
+    
+M = np.zeros((1,1,2), np.float32)
+M[0,:,:] = np.array([cx,cy])
+p0 = M
 
 
 print(p0)
