@@ -69,7 +69,7 @@ def Egalisation_HSL_col(img_BGR):
     return img_egal
 
 
-def detect_color_vid(image,color): 
+def detect_color_vid(img_C,color): 
     
     #Etape 1 : égalisation  HSL
     # inutile pour le moment
