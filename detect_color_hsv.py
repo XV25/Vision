@@ -58,7 +58,7 @@ def detect_color_vid(image,color):
     #Etape 1 : égalisation  HSL
     # inutile pour le moment
 
-    img_egalisation = Egalisation_HSL_col(img_C)
+    img_egalisation = Egalisation_HSL_col(image)
     #    cv2.namedWindow("Ega", cv2.WINDOW_NORMAL) 
 #    cv2.imshow("Ega", img_egalisation)
 
@@ -162,12 +162,12 @@ def detect_color_vid(image,color):
     for i in range (len(contours)):
         cnt = contours[i]
         M = cv2.moments(cnt)
-        if M['m00'] > 400:
+        if M['m00'] > 800:
             cx = int(M['m10']/(M['m00']+1*10**-5))
             cy = int(M['m01']/(M['m00']+1*10**-5))
             L.append([cx,cy])
             #print(M['m00'])
-            cv2.circle(img_C,(cx,cy), 4, (0,255,100), -1) 
+            cv2.circle(image,(cx,cy), 4, (0,255,100), -1) 
             #(x,y),(Ma,ma),angle =  cv2.fitEllipse(cnt)
             #angle : angle de rotation de l'ellipse.
           
@@ -178,13 +178,13 @@ def detect_color_vid(image,color):
             break
         
     cv2.imshow('Mon masque',et2)
-    cv2.imshow("image centroides",img_C)
+    cv2.imshow("image centroides",image)
     return([cy,cx])
     
 if __name__ == "__main__":
     
     plt.close('all')
-    fname  = "image1.png" # 0-255 / 0-15 / 181-230
+    fname  = "Data/Rot/image4.png" # 0-255 / 0-15 / 181-230
     img_C  = cv2.imread(fname)     # Lecture image en couleurs BGR
     
     img_C = cv2.resize(img_C,(640,480))
@@ -198,5 +198,5 @@ if __name__ == "__main__":
     # Affichage image via opencv --> affichage format BGR
     plt.figure(1)
     plt.imshow(img_C)
-    L = detect_color_vid(img_C,'B')
+    L = detect_color_vid(img_C,'O')
     print(L)
