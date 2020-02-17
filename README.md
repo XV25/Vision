@@ -14,6 +14,6 @@ Résumé démarche du projet :
 
 Rappel tâches : 
 
-- Fonctionnement webcam --> Nathan
-- Détection couleur dans zone --> Erwann 
-- Implémentation LK / HS --> Coraline
+- Amélioration de détection couleur dans zone --> Nathan
+- Implémentation HS --> Coraline, Théo
+- Implémentation LK --> Erwann
