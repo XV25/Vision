@@ -7,7 +7,7 @@ Created on Mon Feb 17 15:27:15 2020
 """
 
 import cv2
-from detect_color_auto import *
+from detect_color_hsv import *
 import numpy as np
 import matplotlib.pylab as plt
 
@@ -26,6 +26,7 @@ def get_from_pic(img1, img2, mask, color2, good_old2):
     old_gray = cv2.cvtColor(img_C, cv2.COLOR_BGR2GRAY)
     
     color = np.random.randint(0,255,(100,3))
+
 
     L = detect_color_vid(img_C, color2 )
     
@@ -66,8 +67,8 @@ def get_from_pic(img1, img2, mask, color2, good_old2):
     # draw the tracks
     if (good_old2[0,0,0] != 0):
         (a2,b2) = good_old2[0].ravel()
-    
-        frame = cv2.circle(img_C,(a2,b2),5,color[0].tolist(),-1)
+        c,d = good_old[0].ravel()
+        mask = cv2.line(mask, (a2,b2),(c,d), color[5].tolist(), 2)
     
     for i,(new,old) in enumerate(zip(good_new,good_old)):
         a,b = new.ravel()
@@ -83,7 +84,7 @@ def get_from_vid(name_vid):
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     out = cv2.VideoWriter('output2.avi', fourcc, 20.0, (640,  480))
     k = 0
-    color = 'J'
+    color = 'R'
     success,old_image = vidcap.read()
     mask = np.zeros_like(old_image)
     good_old2 = np.zeros((1,2,1))
@@ -111,7 +112,7 @@ if __name__ == "__main__":
     img2 = cv2.imread("Data/Trans/image2.png")     # Lecture image en couleurs BGR
     
     #get_from_pic(img1,img2)
-    gn = get_from_vid('output.avi')
+    gn = get_from_vid('nathan.avi')
     
     
     
