@@ -51,13 +51,13 @@ import time
 ###############################################################################
 # 1. Réhaussement de contraste d'une image couleur
 def Egalisation_HSL_col(img_BGR):
-    img_HSV = cv2.cvtColor(img_BGR,cv2.COLOR_BGR2HLS) # Image BGR --> HSV
-    h,l,s   = cv2.split(img_HSV)                      # Extraction des 3 plans HSV notamment value v
+    img_HSV = cv2.cvtColor(img_BGR,cv2.COLOR_BGR2HLS) # Image BGR --> HSL
+    h,l,s   = cv2.split(img_HSV)                      # Extraction des 3 plans HSL notamment value v
     h_egal = cv2.equalizeHist(h)
     s_egal  = cv2.equalizeHist(s)                     # Egalisation histogramme sur s
     l_egal  = cv2.equalizeHist(l)                     # Egalisation histogramme sur v
     
-    img_egal= img_HSV.copy()                          # Copie de l'image HSV
+    img_egal= img_HSV.copy()                          # Copie de l'image HSL
    # img_egal[:,:,0] = h_egal
   #  img_egal[:,:,2] = s_egal                          # Modification du plan s
     img_egal[:,:,1] = l_egal                          # Modification du plan v
@@ -96,11 +96,11 @@ def detect_color_vid(image,color):
     
     if color == "B":
         Hmin = 90
-        Hmax = 160
-        Smin = 175
+        Hmax = 115
+        Smin = 115
         Smax = 255
-        Lmin = 0
-        Lmax = 255
+        Lmin = 35
+        Lmax = 235
         k1 =1
         kf = 2*k1 + 1 
         k2 =1
@@ -109,10 +109,10 @@ def detect_color_vid(image,color):
     elif color == "V":
         Hmin = 60
         Hmax = 90
-        Smin = 175
+        Smin = 115
         Smax = 255
-        Lmin = 0
-        Lmax = 255
+        Lmin = 35
+        Lmax = 235
         k1 =1
         kf = 2*k1 + 1 
         k2 =1
@@ -120,12 +120,12 @@ def detect_color_vid(image,color):
 
 
     elif color == "J":
-        Hmin = 25
-        Hmax = 50
-        Smin = 175
+        Hmin = 20
+        Hmax = 60
+        Smin = 115
         Smax = 255
-        Lmin = 0
-        Lmax = 255
+        Lmin = 35
+        Lmax = 235
         k1 =1
         kf = 2*k1 + 1 
         k2 =1
@@ -134,23 +134,23 @@ def detect_color_vid(image,color):
 
     elif color == "O":
         Hmin = 0
-        Hmax = 20
-        Smin = 175
+        Hmax = 25
+        Smin = 115
         Smax = 255
-        Lmin = 0
-        Lmax = 255
+        Lmin = 35
+        Lmax = 235
         k1 =1
         kf = 2*k1 + 1 
         k2 =1
         ko = 2*k2 + 1 
     
     elif color == "R":
-        Hmin = 160
-        Hmax = 175
-        Smin = 175
+        Hmin = 115
+        Hmax = 165
+        Smin = 115
         Smax = 255
-        Lmin = 0
-        Lmax = 255
+        Lmin = 35
+        Lmax = 235
         k1 =1
         kf = 2*k1 + 1 
         k2 =1
@@ -183,7 +183,7 @@ def detect_color_vid(image,color):
             cy = int(M['m01']/(M['m00']+1*10**-5))
             L.append([cx,cy])
             #print(M['m00'])
-            cv2.circle(img_C,(cx,cy), 4, (0,0,255), -1) 
+            cv2.circle(img_C,(cx,cy), 4, (0,255,100), -1) 
             #(x,y),(Ma,ma),angle =  cv2.fitEllipse(cnt)
             #angle : angle de rotation de l'ellipse.
           
@@ -191,17 +191,16 @@ def detect_color_vid(image,color):
             #x,y,w,h = cv2.boundingRect(cnt)
             #rect_area = w*h
             #extent = float(area)/rect_area
-            T += 1
-            if T > 1 :
-                #print(T)
-                break
+            break
+        
     cv2.imshow('Mon masque',et2)
     cv2.imshow("image centroides",img_C)
     return([cy,cx])
     
 if __name__ == "__main__":
     
-    fname  = "all_colors.jpg" # 0-255 / 0-15 / 181-230
+    plt.close('all')
+    fname  = "Data/Rot/image1.png" # 0-255 / 0-15 / 181-230
     img_C  = cv2.imread(fname)     # Lecture image en couleurs BGR
     
     img_C = cv2.resize(img_C,(640,480))

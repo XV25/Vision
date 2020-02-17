@@ -43,7 +43,7 @@ import cv2
 import time
 
 
-fname  = "all_colors.jpg" # 0-255 / 0-15 / 181-230
+fname  = "Data/Trans/image1.png" # 0-255 / 0-15 / 181-230
 img_C  = cv2.imread(fname)     # Lecture image en couleurs BGR
 
 img_C = cv2.resize(img_C,(640,480))

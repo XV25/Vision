@@ -9,7 +9,7 @@ while(True):
     if  key == ord('q'):
         break
     if key == ord('s'):
-        nom='image'+str(i)+'.png'
+        nom='Data/Rot/image'+str(i)+'.png'
         cv2.imwrite(nom,frame)
         i=i+1;
    
