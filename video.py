@@ -9,7 +9,7 @@ while cap.isOpened():
     if not ret:
         print("Can't receive frame (stream end?). Exiting ...")
         break
-        out.write(frame)
+    out.write(frame)
     cv.imshow('frame', frame)
     if cv.waitKey(1) == ord('q'):
         break
