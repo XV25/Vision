@@ -99,7 +99,7 @@ def get_from_vid(name_vid,colors_values = {}):
     success,old_image = vidcap.read()
     
     if colors_values == {}:
-        colors_values = check_all_color(old_image, ['R','V', 'B','O','J']) 
+        colors_values = check_all_color(old_image, ['R','V'])  # , 'B','O','J'
     
     M = np.zeros((len(colors_values),1,2), np.float32)
     i = 0
@@ -173,14 +173,18 @@ def get_from_vid(name_vid,colors_values = {}):
         #     success = False
     out.release()
     cv2.destroyAllWindows()
-    return(color_values)
+    return(colors_values)
 
 if __name__ == "__main__":
     img1  = cv2.imread("Data/Trans/image1.png")     # Lecture image en couleurs BGR
     img2 = cv2.imread("Data/Trans/image2.png")     # Lecture image en couleurs BGR
     
     #get_from_pic(img1,img2)
-    gn = get_from_vid('nathan.avi')
+    
+    S = {'R': np.array([149, 100,  48, 255, 255, 255,   0]),
+     'V': np.array([ 45,  82,   0, 100, 255, 255,   0])}
+    
+    gn = get_from_vid('nathan.avi',S)
     
     
     
