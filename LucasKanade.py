@@ -8,6 +8,8 @@ Created on Mon Feb 17 15:27:15 2020
 
 import cv2
 from detect_color_hsv import *
+from check_detection_values import check_all_color
+
 import numpy as np
 import matplotlib.pylab as plt
 
@@ -79,33 +81,99 @@ def get_from_pic(img1, img2, mask, color2, good_old2):
     return(img_C,mask,good_new)
     
 
-def get_from_vid(name_vid):
+def get_from_vid(name_vid,colors_values = {}):
+    
+    color = np.random.randint(0,255,(100,3))
+
+    
+    
+    lk_params = dict( winSize  = (15,15),
+                  maxLevel = 2,
+                  criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+
+    
     vidcap = cv2.VideoCapture(name_vid)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     out = cv2.VideoWriter('output2.avi', fourcc, 20.0, (640,  480))
     k = 0
-    color = 'R'
     success,old_image = vidcap.read()
+    
+    if colors_values == {}:
+        colors_values = check_all_color(old_image, ['R','V', 'B','O','J']) 
+    
+    M = np.zeros((len(colors_values),1,2), np.float32)
+    i = 0
+    for tcolor in colors_values:
+        lower = colors_values[tcolor][0:3]
+        upper = colors_values[tcolor][3:6]
+        k1 = colors_values[tcolor][6]
+        L = detect_color_vid2(old_image, lower, upper, k1)
+        M[i,:,:] = np.array(L)
+        i+=1
+    # mask = np.zeros_like(old_image)
+    # good_old2 = np.zeros((1,2,1))
+    p0 = M
+    
+    old_gray = cv2.cvtColor(old_image, cv2.COLOR_BGR2GRAY)
     mask = np.zeros_like(old_image)
-    good_old2 = np.zeros((1,2,1))
+
+
+    # upgrade : si distance entre deux points dentique trop grande 
+    # --> risque de perte de point
+    # --> réutiliser détection des couleurs
+    
+    
     while success:
-        success,new_image = vidcap.read()
-        if success:
-            imgC,mask,gn = get_from_pic(old_image, new_image, mask ,color, good_old2)
-            new_image = cv2.add(imgC,mask)
-            out.write(new_image)
+        success,frame = vidcap.read()
+        if (success):
+            frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    
+        # calculate optical flow
+            p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, p0, None, **lk_params)
+        
+        # Select good points
+            # good_new = p1[st==1]
+            # good_old = p0[st==1]
+    
+            good_new = p1
+            good_old = p0
+        
+        # draw the tracks
+            for i,(new,old) in enumerate(zip(good_new,good_old)):
+                a,b = new.ravel()
+                c,d = old.ravel()
+                mask = cv2.line(mask, (a,b),(c,d), color[i].tolist(), 2)
+                frame = cv2.circle(frame,(a,b),5,color[i].tolist(),-1)
+            img = cv2.add(frame,mask)
+    
+            cv2.imshow('frame',img)
+            k = cv2.waitKey(30) & 0xff
+            if k == 27:
+                break
+    
+        # Now update the previous frame and previous points
+            old_gray = frame_gray.copy()
+            p0 = good_new.reshape(-1,1,2)
+        
+        
+        
+        # success,new_image = vidcap.read()
+        # if success:
+        #     imgC,mask,gn = get_from_pic(old_image, new_image, mask ,color, good_old2)
+        #     new_image = cv2.add(imgC,mask)
+        #     out.write(new_image)
 
 
-            #cv2.imshow('frame %i'%k,new_image)
-            k+=1
-            old_image = new_image
-            good_old2 = gn
-            print(good_old2[0,0,0])
-        if (k > 120):
-            success = False
+        #     #cv2.imshow('frame %i'%k,new_image)
+        #     k+=1
+        #     old_image = new_image
+        #     good_old2 = gn
+        #     print(good_old2[0,0,0])
+        # if (k > 120):
+        #     success = False
     out.release()
     cv2.destroyAllWindows()
-    return(gn)
+    return(color_values)
 
 if __name__ == "__main__":
     img1  = cv2.imread("Data/Trans/image1.png")     # Lecture image en couleurs BGR

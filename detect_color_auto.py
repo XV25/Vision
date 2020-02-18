@@ -175,23 +175,21 @@ def detect_color_vid(img_C,color):
     T = 0
     L = []
     cx,cy = 0,0
+    Mmax = 0
+    cnt_max = None
+
     for i in range (len(contours)):
         cnt = contours[i]
         M = cv2.moments(cnt)
-        if M['m00'] > 400:
-            cx = int(M['m10']/(M['m00']+1*10**-5))
-            cy = int(M['m01']/(M['m00']+1*10**-5))
-            L.append([cx,cy])
-            #print(M['m00'])
-            cv2.circle(img_C,(cx,cy), 4, (0,255,100), -1) 
-            #(x,y),(Ma,ma),angle =  cv2.fitEllipse(cnt)
-            #angle : angle de rotation de l'ellipse.
-          
-            #area = cv2.contourArea(cnt)
-            #x,y,w,h = cv2.boundingRect(cnt)
-            #rect_area = w*h
-            #extent = float(area)/rect_area
-            break
+        if M['m00'] > Mmax:
+            Mmax = M['m00']
+            cnt_max = cnt
+ 
+    M = cv2.moments(cnt_max)       
+    cx = int(M['m10']/(M['m00']+1*10**-5))
+    cy = int(M['m01']/(M['m00']+1*10**-5))
+    cv2.circle(img_C,(cx,cy), 4, (0,255,100), -1) 
+        
         
     cv2.imshow('Mon masque',et2)
     cv2.imshow("image centroides",img_C)
