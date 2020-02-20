@@ -184,8 +184,8 @@ def check_color(img_C):    # Lecture image en couleurs BGR
     
     
     cv2.namedWindow('Mon masque',cv2.WINDOW_NORMAL)
-    cv2.createTrackbar('Hmin','Mon masque',0,255,binarizeHSV)
-    cv2.createTrackbar('Hmax','Mon masque',cv2.getTrackbarPos('Hmin','Mon masque'),255,binarizeHSV)
+    cv2.createTrackbar('Hmin','Mon masque',0,360,binarizeHSV)
+    cv2.createTrackbar('Hmax','Mon masque',cv2.getTrackbarPos('Hmin','Mon masque'),360,binarizeHSV)
     cv2.createTrackbar('Smin','Mon masque',0,255,binarizeHSV)
     cv2.createTrackbar('Smax','Mon masque',cv2.getTrackbarPos('Smin','Mon masque'),255,binarizeHSV)
     cv2.createTrackbar('Lmin','Mon masque',0,255,binarizeHSV)
@@ -305,8 +305,8 @@ def check_all_color(img_C,colors):    # Lecture image en couleurs BGR
     
         
         cv2.namedWindow('Mon masque',cv2.WINDOW_NORMAL)
-        cv2.createTrackbar('Hmin','Mon masque',0,255,binarizeHSV)
-        cv2.createTrackbar('Hmax','Mon masque',cv2.getTrackbarPos('Hmin','Mon masque'),255,binarizeHSV)
+        cv2.createTrackbar('Hmin','Mon masque',0,180,binarizeHSV)
+        cv2.createTrackbar('Hmax','Mon masque',cv2.getTrackbarPos('Hmin','Mon masque'),180,binarizeHSV)
         cv2.createTrackbar('Smin','Mon masque',0,255,binarizeHSV)
         cv2.createTrackbar('Smax','Mon masque',cv2.getTrackbarPos('Smin','Mon masque'),255,binarizeHSV)
         cv2.createTrackbar('Vmin','Mon masque',0,255,binarizeHSV)

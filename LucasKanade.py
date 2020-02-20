@@ -212,8 +212,21 @@ if __name__ == "__main__":
      'B': np.array([ 91,  60,   0, 125, 255, 141,   4]),
      'O': np.array([  0, 119,  68,  21, 203, 255,   2]),
      'J': np.array([ 19, 102, 186,  42, 255, 255,   3])}
+    
+    # S all move
+    
+    # S = {'R': np.array([114,  99, 127, 160, 255, 250,   4]), 
+    #      'V': np.array([ 78, 156,  39,  95, 255, 107,   1]) }
+    
+    S  ={'R': np.array([133,  71, 221, 164, 255, 255,   1]),
+ 'B': np.array([ 96, 173, 128, 133, 255, 255,   1])}
+    
+    
+        # 'B': np.array([100, 218,  76, 116, 255, 142,   1])} 
+         #'O': array([162, 112, 190, 255, 255, 255,   1]), 
+         #'J': array([  0,  60, 191,  67, 141, 235,   2])}
          
-    gn,Mtime_LK,Mtime_dc = get_from_vid('output.avi',colors_values = S)
+    gn,Mtime_LK,Mtime_dc = get_from_vid('nathan.avi',colors_values = S)
     
     print("Max time of color detection : ", Mtime_dc)
     print("Max time of LK detection : ", Mtime_LK)    
