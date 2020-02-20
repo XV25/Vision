@@ -159,28 +159,80 @@ def detect_color_vid(image,color):
     T = 0
     L = []
     cx,cy = 0,0
+    Mmax = 0
+    cnt_max = None
+
     for i in range (len(contours)):
         cnt = contours[i]
         M = cv2.moments(cnt)
-        if M['m00'] > 800:
-            cx = int(M['m10']/(M['m00']+1*10**-5))
-            cy = int(M['m01']/(M['m00']+1*10**-5))
-            L.append([cx,cy])
-            #print(M['m00'])
-            cv2.circle(image,(cx,cy), 4, (0,255,100), -1) 
-            #(x,y),(Ma,ma),angle =  cv2.fitEllipse(cnt)
-            #angle : angle de rotation de l'ellipse.
-          
-            #area = cv2.contourArea(cnt)
-            #x,y,w,h = cv2.boundingRect(cnt)
-            #rect_area = w*h
-            #extent = float(area)/rect_area
-            break
+        if M['m00'] > Mmax:
+            Mmax = M['m00']
+            cnt_max = cnt
+ 
+    M = cv2.moments(cnt_max)       
+    cx = int(M['m10']/(M['m00']+1*10**-5))
+    cy = int(M['m01']/(M['m00']+1*10**-5))
+    cv2.circle(img_C,(cx,cy), 4, (0,255,100), -1) 
         
     cv2.imshow('Mon masque',et2)
     cv2.imshow("image centroides",image)
-    return([cy,cx])
+    return([cx,cy])
+   
+
+
+def detect_color_vid2(image,lower,upper,k1): 
     
+    #Etape 1 : égalisation  HSL
+    # inutile pour le moment
+
+    img_egalisation = Egalisation_HSL_col(image)
+    #    cv2.namedWindow("Ega", cv2.WINDOW_NORMAL) 
+
+
+    # imgHSL = cv2.cvtColor(img_C,cv2.COLOR_BGR2HLS)
+    imgHSL = img_egalisation
+
+    kf = 2*k1 + 1 
+    ko = 2*k1 + 1 
+
+
+    img_bin = cv2.inRange(imgHSL,lower,upper)
+
+    if k1 == -1:
+        contours, hierarchy = cv2.findContours(img_bin, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) #[1:]
+    else :
+        kernelf = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kf, kf))
+        kernelo = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (ko, ko))
+        et1 = cv2.morphologyEx(img_bin, cv2.MORPH_CLOSE, kernelf)
+        et2 = cv2.morphologyEx(et1, cv2.MORPH_OPEN, kernelo)
+        contours, hierarchy = cv2.findContours(et2, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) #[1:]
+    #cv2.drawContours(imgfinal, contours, -1, (255,255,0), 1, cv2.LINE_8, hierarchy)
+    #cv2.imshow("image contours",imgfinal)
+
+    T = 0
+    L = []
+    cx,cy = 0,0
+    Mmax = 0
+    cnt_max = None
+
+    for i in range (len(contours)):
+        cnt = contours[i]
+        M = cv2.moments(cnt)
+        if M['m00'] > Mmax:
+            Mmax = M['m00']
+            cnt_max = cnt
+ 
+    M = cv2.moments(cnt_max)       
+    cx = int(M['m10']/(M['m00']+1*10**-5))
+    cy = int(M['m01']/(M['m00']+1*10**-5))
+    cv2.circle(image,(cx,cy), 4, (0,255,100), -1) 
+        
+    cv2.imshow('Mon masque',et2)
+    cv2.imshow("image centroides",image)
+    return([cx,cy])
+    
+
+        
 if __name__ == "__main__":
     
     plt.close('all')

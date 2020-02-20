@@ -78,7 +78,7 @@ while(1):
     p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, p0, None, **lk_params)
     
     # Select good points
-    good_new = p1[st==1]
+    good_new = p1
     good_old = p0[st==1]
     
     # draw the tracks
