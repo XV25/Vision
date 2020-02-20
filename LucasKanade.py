@@ -16,10 +16,13 @@ import matplotlib.pylab as plt
 
 plt.close('all')
 
+import time
+
 def get_from_pic(img1, img2, mask, color2, good_old2):
     
     #name1 = "Data/Trans/image1.png" # 0-255 / 0-15 / 181-230
     #img_C  = cv2.imread(name1)     # Lecture image en couleurs BGR
+    
     
     img_C = img1
     
@@ -81,12 +84,14 @@ def get_from_pic(img1, img2, mask, color2, good_old2):
     return(img_C,mask,good_new)
     
 
-def get_from_vid(name_vid,colors_values = {}):
+def get_from_vid(name_vid,detect_colors =[],colors_values = {}):
+    
+    
+    Mtime_dc = 0
+    Mtime_LK = 0
     
     color = np.random.randint(0,255,(100,3))
 
-    
-    
     lk_params = dict( winSize  = (15,15),
                   maxLevel = 2,
                   criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
@@ -99,17 +104,24 @@ def get_from_vid(name_vid,colors_values = {}):
     success,old_image = vidcap.read()
     
     if colors_values == {}:
-        colors_values = check_all_color(old_image, ['R','V'])  # , 'B','O','J'
+        if detect_colors == []:
+            print("Detecting default colors\n")
+            detect_colors =  ['R','V','B','O','J']
+        colors_values = check_all_color(old_image, detect_colors)  
     
     M = np.zeros((len(colors_values),1,2), np.float32)
     i = 0
+    
     for tcolor in colors_values:
+        print("Detect color : ", tcolor)
         lower = colors_values[tcolor][0:3]
         upper = colors_values[tcolor][3:6]
         k1 = colors_values[tcolor][6]
         L = detect_color_vid2(old_image, lower, upper, k1)
         M[i,:,:] = np.array(L)
         i+=1
+    
+    print(M.shape)
     # mask = np.zeros_like(old_image)
     # good_old2 = np.zeros((1,2,1))
     p0 = M
@@ -129,15 +141,37 @@ def get_from_vid(name_vid,colors_values = {}):
             frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     
         # calculate optical flow
+            t0 = time.time()
             p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, p0, None, **lk_params)
-        
-        # Select good points
-            # good_new = p1[st==1]
-            # good_old = p0[st==1]
-    
-            good_new = p1
+            ftime = time.time()
+            if (ftime - t0 > Mtime_LK):
+                Mtime_LK = ftime - t0
+                
+            # Select good points
+            
+            good_new = p1[st==1]
             good_old = p0
-        
+            
+            # if there is an error in the detection of pixels --> retry to detect the barycenters of the objects
+            
+            if good_new.shape[0]!= len(colors_values):
+                    t0 = time.time()
+                    #print("Lost pixel!")
+                    M = np.zeros((len(colors_values),1,2), np.float32)
+                    i = 0
+                    for tcolor in colors_values:
+                        lower = colors_values[tcolor][0:3]
+                        upper = colors_values[tcolor][3:6]
+                        k1 = colors_values[tcolor][6]
+                        L = detect_color_vid2(old_image, lower, upper, k1)
+                        M[i,:,:] = np.array(L)
+                        i+=1
+                    good_new = M
+                    ftime = time.time()
+                    if (ftime - t0 > Mtime_dc):
+                        Mtime_dc = ftime - t0
+                        
+
         # draw the tracks
             for i,(new,old) in enumerate(zip(good_new,good_old)):
                 a,b = new.ravel()
@@ -156,24 +190,9 @@ def get_from_vid(name_vid,colors_values = {}):
             p0 = good_new.reshape(-1,1,2)
         
         
-        
-        # success,new_image = vidcap.read()
-        # if success:
-        #     imgC,mask,gn = get_from_pic(old_image, new_image, mask ,color, good_old2)
-        #     new_image = cv2.add(imgC,mask)
-        #     out.write(new_image)
-
-
-        #     #cv2.imshow('frame %i'%k,new_image)
-        #     k+=1
-        #     old_image = new_image
-        #     good_old2 = gn
-        #     print(good_old2[0,0,0])
-        # if (k > 120):
-        #     success = False
     out.release()
     cv2.destroyAllWindows()
-    return(colors_values)
+    return(colors_values,Mtime_LK,Mtime_dc)
 
 if __name__ == "__main__":
     img1  = cv2.imread("Data/Trans/image1.png")     # Lecture image en couleurs BGR
@@ -182,9 +201,20 @@ if __name__ == "__main__":
     #get_from_pic(img1,img2)
     
     S = {'R': np.array([149, 100,  48, 255, 255, 255,   0]),
-     'V': np.array([ 45,  82,   0, 100, 255, 255,   0])}
+      'V': np.array([ 45,  82,   0, 100, 255, 255,   0])}
     
-    gn = get_from_vid('nathan.avi',S)
     
+    # S nathan
+    
+ #    S = {'R': np.array([126, 131, 200, 176, 255, 255,   2]),
+ # 'V': np.array([ 65,  66,   0, 100, 165,  47,   2]),
+ # 'B': np.array([100,  78,   0, 122, 180,  69,   2]),
+ # 'O': np.array([  0, 128, 241,  24, 201, 255,   3]),
+ # 'J': np.array([ 24, 129, 231,  52, 252, 255,   2])}
+     
+    gn,Mtime_LK,Mtime_dc = get_from_vid('output.avi',colors_values = S)
+    
+    print("Max time of color detection : ", Mtime_dc)
+    print("Max time of LK detection : ", Mtime_LK)    
     
     
