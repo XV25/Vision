@@ -84,7 +84,7 @@ def get_from_pic(img1, img2, mask, color2, good_old2):
     return(img_C,mask,good_new)
     
 
-def get_from_vid(name_vid,detect_colors =[],colors_values = {}):
+def get_from_vid(name_vid,outfile = 'output2.avi',detect_colors =[],colors_values = {}):
     
     
     Mtime_dc = 0
@@ -99,7 +99,7 @@ def get_from_vid(name_vid,detect_colors =[],colors_values = {}):
     
     vidcap = cv2.VideoCapture(name_vid)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter('output2.avi', fourcc, 20.0, (640,  480))
+    out = cv2.VideoWriter(outfile, fourcc, 20.0, (640,  480))
     k = 0
     success,old_image = vidcap.read()
     
@@ -120,8 +120,7 @@ def get_from_vid(name_vid,detect_colors =[],colors_values = {}):
         L = detect_color_vid2(old_image, lower, upper, k1)
         M[i,:,:] = np.array(L)
         i+=1
-    
-    print(M.shape)
+
     # mask = np.zeros_like(old_image)
     # good_old2 = np.zeros((1,2,1))
     p0 = M
@@ -179,7 +178,7 @@ def get_from_vid(name_vid,detect_colors =[],colors_values = {}):
                 mask = cv2.line(mask, (a,b),(c,d), color[i].tolist(), 2)
                 frame = cv2.circle(frame,(a,b),5,color[i].tolist(),-1)
             img = cv2.add(frame,mask)
-    
+            out.write(img)
             cv2.imshow('frame',img)
             k = cv2.waitKey(30) & 0xff
             if k == 27:
@@ -204,14 +203,16 @@ if __name__ == "__main__":
       'V': np.array([ 45,  82,   0, 100, 255, 255,   0])}
     
     
+    S = {}
+    
     # S nathan
     
- #    S = {'R': np.array([126, 131, 200, 176, 255, 255,   2]),
- # 'V': np.array([ 65,  66,   0, 100, 165,  47,   2]),
- # 'B': np.array([100,  78,   0, 122, 180,  69,   2]),
- # 'O': np.array([  0, 128, 241,  24, 201, 255,   3]),
- # 'J': np.array([ 24, 129, 231,  52, 252, 255,   2])}
-     
+    S = {'R': np.array([163,  63,  49, 255, 189, 255,   0]),
+     'V': np.array([ 54,  81,   0, 100, 255, 255,   2]),
+     'B': np.array([ 91,  60,   0, 125, 255, 141,   4]),
+     'O': np.array([  0, 119,  68,  21, 203, 255,   2]),
+     'J': np.array([ 19, 102, 186,  42, 255, 255,   3])}
+         
     gn,Mtime_LK,Mtime_dc = get_from_vid('output.avi',colors_values = S)
     
     print("Max time of color detection : ", Mtime_dc)
